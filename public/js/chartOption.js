@@ -179,6 +179,7 @@ function chartOption(data) {
       legend: {
         orient: "vertical",
         left: "left",
+        bottom: "0%",
       },
       series: [
         {
@@ -209,6 +210,7 @@ function chartOption(data) {
       legend: {
         orient: "vertical",
         left: "left",
+        bottom: "0%",
       },
       series: [
         {
@@ -239,6 +241,7 @@ function chartOption(data) {
       legend: {
         orient: "vertical",
         left: "left",
+        bottom: "0%",
       },
       series: [
         {
