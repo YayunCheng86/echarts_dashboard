@@ -5,81 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-    <style>
-      body {
-        font-family: "Microsoft JhengHei", Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: white;
-      }
-      .header {
-        text-align: center;
-        margin-bottom: 30px;
-        color: #333;
-      }
-      .dashboard {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 20px;
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-      .chart-container {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-      }
-      .nested-pie-container {
-        grid-column: span 2;
-      }
-      .chart-title {
-        text-align: center;
-        margin-bottom: 15px;
-        color: #666;
-        font-size: 16px;
-      }
-      .chart {
-        width: 100%;
-        height: 300px;
-      }
-      .nested-pie {
-        width: 100%;
-        height: 650px;
-      }
-      .refresh-btn {
-        display: block;
-        margin: 20px auto;
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-      }
-      .refresh-btn:hover {
-        background-color: #0056b3;
-      }
-    </style>
+    <link rel="stylesheet" href="/css/echarts.css" />
   </head>
   <body>
     <div class="header">
       <h1><%= title %></h1>
-      <p>臺北市消防局儀表板展示</p>
+      <p>Echarts 動態圖表</p>
     </div>
 
-    <button class="refresh-btn" onclick="refreshData()">重新整理資料</button>
+    <!-- <button class="refresh-btn" onclick="refreshData()">重新整理資料</button> -->
 
     <div class="dashboard">
-      <div class="chart-container">
-        <div class="chart-title">銷售趨勢圖</div>
-        <div id="lineChart" class="chart"></div>
-      </div>
-
-      <div class="chart-container">
-        <div class="chart-title">效能儀表板</div>
-        <div id="gaugeChart" class="chart"></div>
+      <div class="chart-container two-gridspan-container">
+        <div class="chart-title">折線圖</div>
+        <div id="lineChart" class="lineChart Chart"></div>
       </div>
 
       <div class="chart-container">
@@ -88,10 +27,32 @@
       </div>
 
       <div class="chart-container">
-        <div class="chart-title">柱狀圖</div>
-        <div id="barChart" class="chart"></div>
+        <div class="chart-title">圓餅圖</div>
+        <div id="pieChart2" class="chart"></div>
       </div>
-      <div class="chart-container nested-pie-container">
+
+      <div class="chart-container">
+        <div class="chart-title">圓餅圖</div>
+        <div id="pieChart3" class="chart"></div>
+      </div>
+
+      <div class="chart-container">
+        <div class="chart-title">柱狀圖</div>
+        <p id="status" class="FATStatus_months"></p>
+
+        <button id="switchBtn" class="refresh-btn switch-btn">
+          切換年份／月份
+        </button>
+
+        <div id="mixedBarChart2" class="chart"></div>
+      </div>
+
+      <div class="chart-container two-gridspan-container">
+        <div class="chart-title">柱狀圖</div>
+        <div id="mixedBarChart" class="chart cumulative-frequency"></div>
+      </div>
+
+      <div class="chart-container two-gridspan-container">
         <div class="chart-title">雙層圓餅圖</div>
         <div id="trafficPieChart" class="chart nested-pie"></div>
       </div>
@@ -101,281 +62,6 @@
       <%- JSON.stringify(data) %>
     </script>
 
-    <script>
-      // 初始化所有圖表
-      let lineChart, gaugeChart, pieChart, barChart, trafficPieChart;
-
-      function initCharts() {
-        // 線圖
-        lineChart = echarts.init(document.getElementById("lineChart"));
-
-        // 儀表圖
-        gaugeChart = echarts.init(document.getElementById("gaugeChart"));
-
-        // 圓餅圖
-        pieChart = echarts.init(document.getElementById("pieChart"));
-
-        // 柱狀圖
-        barChart = echarts.init(document.getElementById("barChart"));
-
-        // 雙層圓餅圖
-        trafficPieChart = echarts.init(
-          document.getElementById("trafficPieChart")
-        );
-
-        // 載入初始資料
-        const dataScript = document.getElementById("chart-data");
-        const initialData = JSON.parse(dataScript.textContent);
-        updateCharts(initialData);
-      }
-
-      function updateCharts(data) {
-        // 線圖配置
-        const lineOption = {
-          title: {
-            text: "月銷售額",
-            left: "center",
-          },
-          tooltip: {
-            trigger: "axis",
-          },
-          xAxis: {
-            type: "category",
-            data: data.sales.months,
-          },
-          yAxis: {
-            type: "value",
-          },
-          series: [
-            {
-              data: data.sales.values,
-              type: "line",
-              smooth: true,
-              itemStyle: {
-                color: "#5470c6",
-              },
-            },
-          ],
-        };
-
-        // 儀表圖配置
-        const gaugeOption = {
-          series: [
-            {
-              name: "效能指標",
-              type: "gauge",
-              progress: {
-                show: true,
-              },
-              detail: {
-                valueAnimation: true,
-                formatter: "{value}%",
-              },
-              data: [
-                {
-                  value: data.gauge,
-                  name: "使用率",
-                },
-              ],
-            },
-          ],
-        };
-
-        // 圓餅圖配置
-        const pieOption = {
-          title: {
-            text: "2車送1人比例表",
-            left: "center",
-          },
-          color: ["#fac858", "#3C82D9"],
-          tooltip: {
-            trigger: "item",
-          },
-          legend: {
-            orient: "vertical",
-            left: "left",
-          },
-          series: [
-            {
-              name: "銷售額",
-              type: "pie",
-              radius: "50%",
-              data: data.pie,
-              emphasis: {
-                itemStyle: {
-                  shadowBlur: 10,
-                  shadowOffsetX: 0,
-                  shadowColor: "rgba(0, 0, 0, 0.5)",
-                },
-              },
-            },
-          ],
-        };
-
-        // 雙層圓餅圖配置
-        const trafficPieOption = {
-          title: {
-            text: "未送醫原因比例表",
-            left: "center",
-          },
-          color: [
-            "#4BA3F7",
-            "#91cc75",
-            "#fac858",
-            // 未送醫
-            "#4BA3F7",
-            "#6EC9F5",
-            "#3C82D9",
-            // 已接觸未送醫
-            "#91CC75",
-            "#4CAF50",
-            "#A3E635",
-            "#D9F99D",
-            // 出勤
-            "#FFD166",
-            "#FF9F45",
-          ],
-          tooltip: {
-            trigger: "item",
-            formatter: "{a} <br/>{b}: {c} ({d}%)",
-          },
-          legend: {
-            orient: "horizontal",
-            bottom: "0%",
-            left: "center",
-            data: [
-              "未接觸",
-              "有接觸未送醫",
-              "出勤待命",
-              "未發現",
-              "誤報",
-              "中途取消",
-              "拒送",
-              "警察處理",
-              "現場死亡",
-              "其他",
-              "火警",
-              "支援勤務",
-            ],
-          },
-          series: [
-            {
-              name: "Access From",
-              type: "pie",
-              selectedMode: "single",
-              radius: [0, "30%"],
-              label: {
-                position: "inner",
-                fontSize: 14,
-              },
-              labelLine: {
-                show: false,
-              },
-              data: data.traffic.inner,
-            },
-            {
-              name: "Access From",
-              type: "pie",
-              radius: ["45%", "60%"],
-              labelLine: {
-                length: 30,
-              },
-              label: {
-                formatter: "{a|{a}}{abg|}\n{hr|}\n  {b|{b}：}{c}  {per|{d}%}  ",
-                backgroundColor: "#F6F8FC",
-                borderColor: "#8C8D8E",
-                borderWidth: 1,
-                borderRadius: 4,
-                rich: {
-                  a: {
-                    color: "#6E7079",
-                    lineHeight: 22,
-                    align: "center",
-                  },
-                  hr: {
-                    borderColor: "#8C8D8E",
-                    width: "100%",
-                    borderWidth: 1,
-                    height: 0,
-                  },
-                  b: {
-                    color: "#4C5058",
-                    fontSize: 14,
-                    fontWeight: "bold",
-                    lineHeight: 33,
-                  },
-                  per: {
-                    color: "#fff",
-                    backgroundColor: "#4C5058",
-                    padding: [3, 4],
-                    borderRadius: 4,
-                  },
-                },
-              },
-              data: data.traffic.outer,
-            },
-          ],
-        };
-
-        // 柱狀圖配置
-        const barOption = {
-          title: {
-            text: "年度月份累計次數(人次/車次)",
-            left: "center",
-          },
-          tooltip: {
-            trigger: "axis",
-          },
-          xAxis: {
-            type: "category",
-            data: data.sales.months,
-          },
-          yAxis: {
-            type: "value",
-          },
-          series: [
-            {
-              data: data.sales.values,
-              type: "bar",
-              itemStyle: {
-                color: "#91cc75",
-              },
-            },
-          ],
-        };
-
-        // 更新圖表
-        lineChart.setOption(lineOption);
-        gaugeChart.setOption(gaugeOption);
-        pieChart.setOption(pieOption);
-        barChart.setOption(barOption);
-        trafficPieChart.setOption(trafficPieOption);
-      }
-
-      // 重新整理資料
-      async function refreshData() {
-        try {
-          const response = await fetch("/api/chart-data");
-          const newData = await response.json();
-          updateCharts(newData);
-        } catch (error) {
-          console.error("資料重新整理失敗:", error);
-        }
-      }
-
-      // 響應式調整
-      window.addEventListener("resize", function () {
-        lineChart.resize();
-        gaugeChart.resize();
-        pieChart.resize();
-        barChart.resize();
-        trafficPieChart.resize();
-      });
-
-      // 頁面載入完成後初始化圖表
-      window.onload = function () {
-        initCharts();
-      };
-    </script>
+    <script type="module" src="/js/chartData.js"></script>
   </body>
 </html>
