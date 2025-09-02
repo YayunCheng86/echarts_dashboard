@@ -182,7 +182,7 @@ function chartOption(data) {
       },
       series: [
         {
-          name: "銷售額",
+          name: "救護案件",
           type: "pie",
           radius: "50%",
           data: data.pie,
@@ -212,7 +212,7 @@ function chartOption(data) {
       },
       series: [
         {
-          name: "銷售額",
+          name: "救護案件",
           type: "pie",
           radius: "50%",
           data: data.SGA,
@@ -242,7 +242,7 @@ function chartOption(data) {
       },
       series: [
         {
-          name: "銷售額",
+          name: "救護案件",
           type: "pie",
           radius: "50%",
           data: data.Endo,
@@ -304,7 +304,7 @@ function chartOption(data) {
       },
       series: [
         {
-          name: "Access From",
+          name: "類別",
           type: "pie",
           selectedMode: "single",
           radius: [0, "30%"],
@@ -318,7 +318,7 @@ function chartOption(data) {
           data: data.traffic.inner,
         },
         {
-          name: "Access From",
+          name: "細項",
           type: "pie",
           radius: ["45%", "60%"],
           labelLine: {

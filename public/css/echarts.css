@@ -11,9 +11,9 @@ body {
 }
 .dashboard {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(40%, 1fr));
   gap: 20px;
-  max-width: 1200px;
+  max-width: 70%;
   margin: 0 auto;
 }
 .chart-container {
